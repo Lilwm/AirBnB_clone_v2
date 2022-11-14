@@ -128,7 +128,7 @@ class HBNBCommand(cmd.Cmd):
             my_list = line.split(" ")
             obj = eval("{}()".format(my_list[0]))
             #params
-             my_params = my_list[1:]
+            my_params = my_list[1:]
             for i in my_params:
                 split_param = i.split("=")
                 to_rep = split_param[1].replace("_", " ")
