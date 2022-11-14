@@ -22,12 +22,10 @@ class BaseModel:
         """Instantiation of base model class
         Args:
             args: it won't be used
-            kwargs: arguments for the constructor of the BaseModel
+            kwargs: arguments for This is the class for Amenity
         Attributes:
-            id: unique id generated
-            created_at: creation date
-            updated_at: updated date
-        """
+            name: input name
+            """
         if id not in kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
@@ -72,8 +70,8 @@ class BaseModel:
 
         if "_sa_instance_state" in my_dict:
             del my_dict["_sa_instance_state"]
-
         return my_dict
+
     def delete(self):
         """Deletes the current instance from the storage
         """
