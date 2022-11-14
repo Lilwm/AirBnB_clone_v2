@@ -2,6 +2,8 @@
 """ Console Module """
 import cmd
 import sys
+from models import storage
+from datetime import datetime
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -10,7 +12,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-
+from shlex import split
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
@@ -113,18 +115,29 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
+    def do_create(self, line):
+         """Creates a new instance of BaseModel, saves it
+         Exceptions:
+            SyntaxError: when there is no args given
+            NameError: when there is no object taht has the name
+         """
+        try:
+            if not line:
+                raise SyntaxError()
+            my_list = line.split(" ")
+            obj = eval("{}()".format(my_list[0]))
+            #params
+             my_params = my_list[1:]
+            for i in my_params:
+                split_param = i.split("=")
+                to_rep = split_param[1].replace("_", " ")
+                obj.__dict__[split_param[0]] = to_rep
+            obj.save()
+            print("{}".format(obj.id))
+        except SyntaxError:
             print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        except NameError:
+            print("** class doesn't exist **")
 
     def help_create(self):
         """ Help information for the create method """
