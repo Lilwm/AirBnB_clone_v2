@@ -16,7 +16,8 @@ class FileStorage:
         __file_path: path to the JSON file
         __objects: objects will be stored
     """
-    __file_path = 'file.json'
+
+    __file_path = "file.json"
     __objects = {}
 
     def all(self, cls=None):
@@ -30,7 +31,6 @@ class FileStorage:
                     my_dict[k] = v
                 return my_dict
 
-
     def new(self, obj):
         """Adds new object to storage dictionary"""
         if obj:
@@ -42,14 +42,13 @@ class FileStorage:
         my_dict = {}
         for key, value in self.__objects.items():
             my_dict[key] = value.to_dict()
-        with open(self.__file_path, 'w', encoding="UTF-8") as f:
+        with open(self.__file_path, "w", encoding="UTF-8") as f:
             json.dump(my_dict, f)
-
 
     def reload(self):
         """Loads storage dictionary from file"""
         try:
-            with open(self.__file_path, 'r', encoding="UTF-8") as f:
+            with open(self.__file_path, "r", encoding="UTF-8") as f:
                 for key, value in (json.load(f)).items():
                     value = eval(value["__class__"])(**value)
                     self.__objects[key] = value
@@ -57,8 +56,7 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """Deletes obj from __objects if it's inside
-        """
+        """Deletes obj from __objects if it's inside"""
         if obj:
             key = "{}.{}".format(obj.__class__.__name__, obj.id)
             if key in self.__objects.keys():

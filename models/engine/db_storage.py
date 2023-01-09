@@ -15,17 +15,21 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 class DBStorage:
     """SQL db class"""
+
     __engine = None
     __session = None
 
     def __init__(self):
         """Instantiation"""
-        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".format(
-                                      os.getenv("HBNB_MYSQL_USER"),
-                                      os.getenv("HBNB_MYSQL_PWD"),
-                                      os.getenv("HBNB_MYSQL_HOST"),
-                                      os.getenv("HBNB_MYSQL_DB")),
-                                      pool_pre_ping=True)
+        self.__engine = create_engine(
+            "mysql+mysqldb://{}:{}@{}/{}".format(
+                os.getenv("HBNB_MYSQL_USER"),
+                os.getenv("HBNB_MYSQL_PWD"),
+                os.getenv("HBNB_MYSQL_HOST"),
+                os.getenv("HBNB_MYSQL_DB"),
+            ),
+            pool_pre_ping=True,
+        )
 
         if os.getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(bind=self.__engine)
@@ -53,7 +57,7 @@ class DBStorage:
         """New"""
         try:
             self.__session.add(obj)
-        except:
+        except NameError:
             pass
 
     def save(self):
