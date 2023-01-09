@@ -47,7 +47,6 @@ class DBStorage:
         for i in temp:
             key = "{}.{}".format(i.__class__.__name__, i.id)
             res_dict[key] = i
-
         return res_dict
 
     def new(self, obj):

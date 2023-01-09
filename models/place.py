@@ -9,12 +9,12 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
 from sqlalchemy.orm import relationship
 
 place_amenity = Table("place_amenity", Base.metadata,
-                      Column("place_id", String(60),
-                             ForeignKey("places.id"),
-                             primary_key=True, nullable=False),
-                      Column("amenity_id", String(60),
-                             ForeignKey("amenities.id"),
-                             primary_key=True, nullable=False))
+        Column("place_id", String(60),
+            ForeignKey("places.id"),
+            primary_key=True, nullable=False),
+        Column("amenity_id", String(60),
+            ForeignKey("amenities.id"),
+            primary_key=True, nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -33,10 +33,10 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
         amenities = relationship("Amenity", secondary="place_amenity",
-                                 viewonly=False)
+                viewonly=False)
         amenity_ids = []
     else:
-    city_id = ""
+        city_id = ""
     user_id = ""
     name = ""
     description = ""
@@ -49,12 +49,12 @@ class Place(BaseModel, Base):
     amenity_ids = []
 
     @property
-        def reviews(self):
-            """returns list of Reviews instances"""
-            res = []
-            for i in models.storage.all(Review).values():
-                if i.place_id == self.id:
-                    res.append(i)
+    def reviews(self):
+        """returns list of Reviews instances"""
+        res = []
+        for i in models.storage.all(Review).values():
+            if i.place_id == self.id:
+                res.append(i)
             return res
 
         @property

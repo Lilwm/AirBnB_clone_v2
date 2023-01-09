@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 import models
 import os
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 
@@ -11,7 +12,7 @@ Base = declarative_base()
 
 
 class BaseModel:
-     """This class will defines all common attributes/methods
+    """This class will defines all common attributes/methods
     for other classes
     """
     id = Column(String(60), unique=True, nullable=False, primary_key=True)
@@ -25,12 +26,11 @@ class BaseModel:
             kwargs: arguments for This is the class for Amenity
         Attributes:
             name: input name
-            """
+        """
         if id not in kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
         
         if kwargs:
             for key, value in kwargs.items():

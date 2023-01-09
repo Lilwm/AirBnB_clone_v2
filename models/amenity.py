@@ -6,9 +6,9 @@ from sqlalchemy.orm import relationship
 import os
 
 class Amenity(BaseModel, Base):
-     """This is the class for Amenity
+    """This is the class for Amenity
     Attributes:
-        name: input name
+    name: input name
     """
     __tablename__ = "amenities"
 
