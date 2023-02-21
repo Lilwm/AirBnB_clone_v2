@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """SQL db engine class"""
 import json
-import os
+from os import getenv
 from models.base_model import BaseModel, Base
 from models.user import User
 from models.state import State
@@ -23,38 +23,37 @@ class DBStorage:
         """Instantiation"""
         self.__engine = create_engine(
             "mysql+pymysql://{}:{}@{}/{}".format(
-                os.getenv("HBNB_MYSQL_USER"),
-                os.getenv("HBNB_MYSQL_PWD"),
-                os.getenv("HBNB_MYSQL_HOST"),
-                os.getenv("HBNB_MYSQL_DB"),
+                getenv("HBNB_MYSQL_USER"),
+                getenv("HBNB_MYSQL_PWD"),
+                getenv("HBNB_MYSQL_HOST"),
+                getenv("HBNB_MYSQL_DB"),
             ),
             pool_pre_ping=True,
         )
 
-        if os.getenv("HBNB_ENV") == "test":
+        if getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(bind=self.__engine)
 
     def all(self, cls=None):
-        """All"""
-        res_dict = {}
-        temp = []
+        """Query and return all objects by class/generally
+        Return: dictionary (<class-name>.<object-id>: <obj>)
+        """
+        obj_dict = {}
 
-        if cls is not None:
-            temp = self.__session.query(cls).all()
+        if cls:
+            for row in self.__session.query(cls).all():
+                # populate dict with objects from storage
+                obj_dict.update({'{}.{}'.
+                                format(type(cls).__name__, row.id,): row})
         else:
-            temp += self.__session.query(User).all()
-            temp += self.__session.query(State).all()
-            temp += self.__session.query(City).all()
-            temp += self.__session.query(Amenity).all()
-            temp += self.__session.query(Place).all()
-            temp += self.__session.query(Review).all()
-        for i in temp:
-            key = "{}.{}".format(i.__class__.__name__, i.id)
-            res_dict[key] = i
-        return res_dict
+            for key, val in all_classes.items():
+                for row in self.__session.query(val):
+                    obj_dict.update({'{}.{}'.
+                                    format(type(row).__name__, row.id,): row})
+        return obj_dict
 
     def new(self, obj):
-        """New"""
+        """Add object to current database session"""
         try:
             self.__session.add(obj)
         except NameError:
@@ -65,15 +64,27 @@ class DBStorage:
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Delete"""
-        if obj is not None:
-            self.__session.delete(obj)
+        """Delete obj from database session
+        """
+        if obj:
+            # determine class from obj
+            cls_name = all_classes[type(obj).__name__]
+
+            # query class table and delete
+            self.__session.query(cls_name).\
+                filter(cls_name.id == obj.id).delete()
 
     def reload(self):
-        """Reload"""
+        """Create database session
+        """
+        # create session from current engine
         Base.metadata.create_all(self.__engine)
-        current = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(current)
+        # create db tables
+        session = sessionmaker(bind=self.__engine,
+                               expire_on_commit=False)
+        # previousy:
+        # Session = scoped_session(session)
+        self.__session = scoped_session(session)
 
     def close(self):
         """calls session close"""
