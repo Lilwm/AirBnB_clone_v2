@@ -4,23 +4,34 @@ from models.base_model import BaseModel, Base
 from models.city import City
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-import os
+from os import environ
 
 class State(BaseModel, Base):
-    """ State class """
-    __tablename__ = "states"
+    """This is the class for State
+    Attributes:
+        __tablename__: name of MySQL table
+        name: input name
+    """
+    __tablename__ = 'states'
+    name = Column(String(128), nullable=False)
 
-    if os.getenv("HBNB_TYPE_STORAGE") == "db":
-        name = Column(String(128), nullable=False)
-        cities = relationship("City", cascade="all", backref="state")
+    if environ['HBNB_TYPE_STORAGE'] == 'db':
+        cities = relationship('City', cascade='all, delete', backref='state')
     else:
-        name = ""
-
         @property
         def cities(self):
-            """returns city list instead"""
-            res = []
-            for i in models.storage.all(City).values():
-                if i.state_id == self.id:
-                    res.append(i)
-            return res
+            """Getter method for cities
+            Return: list of cities with state_id equal to self.id
+            """
+            from models import storage
+            from models.city import City
+            # return list of City objs in __objects
+            cities_dict = storage.all(City)
+            cities_list = []
+
+            # copy values from dict to list
+            for city in cities_dict.values():
+                if city.state_id == self.id:
+                    cities_list.append(city)
+
+            return cities_list

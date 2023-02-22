@@ -12,6 +12,9 @@ from models.review import Review
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
+all_classes = {'User': User,'State': State, 
+               'City': City, 'Amenity': Amenity,
+               'Place': Place, 'Review': Review}
 
 class DBStorage:
     """SQL db class"""
@@ -22,7 +25,7 @@ class DBStorage:
     def __init__(self):
         """Instantiation"""
         self.__engine = create_engine(
-            "mysql+pymysql://{}:{}@{}/{}".format(
+                "mysql+mysqldb://{}:{}@{}:3306/{}".format(
                 getenv("HBNB_MYSQL_USER"),
                 getenv("HBNB_MYSQL_PWD"),
                 getenv("HBNB_MYSQL_HOST"),
@@ -30,9 +33,9 @@ class DBStorage:
             ),
             pool_pre_ping=True,
         )
-
+        # drop tables if test environment
         if getenv("HBNB_ENV") == "test":
-            Base.metadata.drop_all(bind=self.__engine)
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query and return all objects by class/generally
@@ -54,10 +57,7 @@ class DBStorage:
 
     def new(self, obj):
         """Add object to current database session"""
-        try:
-            self.__session.add(obj)
-        except NameError:
-            pass
+        self.__session.add(obj)
 
     def save(self):
         """Save"""
@@ -82,10 +82,10 @@ class DBStorage:
         # create db tables
         session = sessionmaker(bind=self.__engine,
                                expire_on_commit=False)
-        # previousy:
+        # previously:
         # Session = scoped_session(session)
         self.__session = scoped_session(session)
 
     def close(self):
         """calls session close"""
-        self.__session.close()
+        self.__session.remove()

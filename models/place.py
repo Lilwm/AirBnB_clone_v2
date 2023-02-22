@@ -1,11 +1,10 @@
 #!/usr/bin/python3
-""" Place Module for HBNB project """
-import models
+"""This is the place class"""
 from models.base_model import BaseModel, Base
-from os import environ
-import sqlalchemy
-from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
+from sqlalchemy import Column, String, Float, Integer, ForeignKey, Table
 from sqlalchemy.orm import relationship
+from os import environ
+
 
 place_amenity = Table('place_amenity', Base.metadata,
                       Column('place_id', String(60),
@@ -17,8 +16,22 @@ place_amenity = Table('place_amenity', Base.metadata,
 
 
 class Place(BaseModel, Base):
-    """Representation of Place """
+    """This is the class for Place
+    Attributes:
+        city_id: city id
+        user_id: user id
+        name: name input
+        description: string of description
+        number_rooms: number of room in int
+        number_bathrooms: number of bathrooms in int
+        max_guest: maximum guest in int
+        price_by_night:: pice for a staying in int
+        latitude: latitude in flaot
+        longitude: longitude in float
+        amenity_ids: list of Amenity ids
+    """
     __tablename__ = 'places'
+
     city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
@@ -29,7 +42,7 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    reviews = relationship("Review", backref="place")
+    amenity_ids = []
 
     if environ['HBNB_TYPE_STORAGE'] == 'db':
         reviews = relationship('Review',
@@ -37,7 +50,6 @@ class Place(BaseModel, Base):
         amenities = relationship('Amenity', backref='place_amenities',
                                  secondary='place_amenity',
                                  viewonly=False)
-
     else:
         @property
         def reviews(self):
